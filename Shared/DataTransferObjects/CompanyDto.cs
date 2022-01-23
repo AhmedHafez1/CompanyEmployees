@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Service.Contracts
+namespace Shared.DataTransferObjects
 {
-    public interface IEmployeeService
-    {
-    }
+    public record CompanyDto(Guid Id, string Name, string FullAddress);
 }
