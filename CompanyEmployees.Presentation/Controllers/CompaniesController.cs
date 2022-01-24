@@ -24,15 +24,8 @@ namespace CompanyEmployees.Presentation.Controllers
         [HttpGet]
         public ActionResult GetCompanies()
         {
-            try
-            {
-                var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
+            var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
                 return Ok(companies);
-            }
-            catch
-            {
-                return StatusCode(500, "Internal Server Error");
-            }
         }
     }
 }
