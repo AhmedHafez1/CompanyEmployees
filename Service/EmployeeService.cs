@@ -6,22 +6,35 @@ using System.Threading.Tasks;
 using Service.Contracts;
 using Contracts;
 using AutoMapper;
+using Shared.DataTransferObjects;
+using Entities.Exceptions;
 
 namespace Service
 {
     internal class EmployeeService : IEmployeeService
     {
-        private readonly IRepositoryManager _repositoryManager;
+        private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
 
-        public EmployeeService(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper)
+        public EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
         {
-            _repositoryManager = repositoryManager;
+            _repository = repository;
             _logger = logger;
             _mapper = mapper;
         }
 
+        public IEnumerable<EmployeeDto> GetEmployees(Guid companyId, bool trackChanges)
+        {
+            var company = _repository.Company.GetCompany(companyId, trackChanges);
 
+            if (company is null)
+                throw new CompanyNotFoundException(companyId);
+
+            var employees = _repository.Employee.GetEmployees(companyId, trackChanges);
+            var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+
+            return employeesDto;
+        }
     }
 }

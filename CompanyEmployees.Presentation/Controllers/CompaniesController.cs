@@ -25,7 +25,14 @@ namespace CompanyEmployees.Presentation.Controllers
         public ActionResult GetCompanies()
         {
             var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
-                return Ok(companies);
+            return Ok(companies);
+        }
+
+        [HttpGet("{id:Guid}")]
+        public IActionResult GetCompany(Guid id)
+        {
+            var company = _service.CompanyService.GetCompany(id, trackChanges: false);
+            return Ok(company);
         }
     }
 }
