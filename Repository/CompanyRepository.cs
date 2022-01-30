@@ -10,9 +10,9 @@ internal sealed class CompanyRepository : RepositoryBase<Company>, ICompanyRepos
 	{
 	}
 
-	public void CreateCompany(Company company) => CreateCompany(company);
+	public void CreateCompany(Company company) => Create(company);
 
-    public void DeleteCompany(Company company) => DeleteCompany(company);
+    public void DeleteCompany(Company company) => Delete(company);
 
     public IEnumerable<Company> GetAllCompanies(bool trackChanges) =>
 		FindAll(trackChanges)

@@ -49,7 +49,7 @@ public class CompaniesController : ControllerBase
         return Ok(companies);
     }
 
-    [HttpGet("collection")]
+    [HttpPost("collection")]
     public IActionResult CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companiesCollection)
     {
         var (companies, ids) = _service.CompanyService
