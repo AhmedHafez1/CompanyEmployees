@@ -32,9 +32,10 @@ public class CompaniesController : ControllerBase
     public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
     {
         if (company is null)
-        {
             return BadRequest("CompanyForCreationDto object is null");
-        }
+
+        if(!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
 
         var companyToReturn = _service.CompanyService.CreateCompany(company);
 
