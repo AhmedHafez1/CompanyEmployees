@@ -1,38 +1,76 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CompanyEmployees.Presentation.ModelBinders;
+using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using Shared.DataTransferObjects;
 
+namespace CompanyEmployees.Presentation.Controllers;
 
-namespace CompanyEmployees.Presentation.Controllers
+[Route("api/companies")]
+[ApiController]
+public class CompaniesController : ControllerBase
 {
-    [Route("api/companies")]
-    [ApiController]
-    public class CompaniesController : ControllerBase
+    private readonly IServiceManager _service;
+
+    public CompaniesController(IServiceManager service) => _service = service;
+
+    [HttpGet]
+    public IActionResult GetCompanies()
     {
-        private readonly IServiceManager _service;
+        var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
 
-        public CompaniesController(IServiceManager service)
+        return Ok(companies);
+    }
+
+    [HttpGet("{id:guid}", Name = "CompanyById")]
+    public IActionResult GetCompany(Guid id)
+    {
+        var company = _service.CompanyService.GetCompany(id, trackChanges: false);
+        return Ok(company);
+    }
+
+    [HttpPost]
+    public IActionResult CreateCompany([FromBody] CompanyForCreationDto company)
+    {
+        if (company is null)
         {
-            _service = service;
+            return BadRequest("CompanyForCreationDto object is null");
         }
 
-        [HttpGet]
-        public ActionResult GetCompanies()
-        {
-            try
-            {
-                var companies = _service.CompanyService.GetAllCompanies(trackChanges: false);
-                return Ok(companies);
-            }
-            catch
-            {
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
+        var companyToReturn = _service.CompanyService.CreateCompany(company);
+
+        return CreatedAtRoute("CompanyById", new { id = companyToReturn.Id }, companyToReturn);
+    }
+
+    [HttpGet("collection/({ids})", Name = "CompanyCollection")]
+    public IActionResult GetCompaniesByIds([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
+    {
+        var companies = _service.CompanyService.GetCompaniesByIds(ids, trackChanges: false);
+
+        return Ok(companies);
+    }
+
+    [HttpGet("collection")]
+    public IActionResult CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companiesCollection)
+    {
+        var (companies, ids) = _service.CompanyService
+            .CreateCompanyCollection(companiesCollection);
+
+        return CreatedAtRoute("CompanyCollection", new { ids }, companies);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public IActionResult DeleteCompany(Guid id)
+    {
+        _service.CompanyService.DeleteCompany(id, trackChanges: false);
+        return NoContent();
+    }
+
+    [HttpPut("{id:guid}")]
+    public ActionResult UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
+    {
+        if (company is null)
+            return BadRequest("CompanyForUpdateDto object is null");
+        _service.CompanyService.UpdateCompany(id, company, trackChanges: true);
+        return NoContent();
     }
 }

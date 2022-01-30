@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entities.Models;
 
-namespace Contracts
+namespace Contracts;
+
+public interface IEmployeeRepository
 {
-    public interface IEmployeeRepository
-    {
-    }
+	IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges);
+	Employee GetEmployee(Guid companyId, Guid id, bool trackChanges);
+	void CreateEmployee(Employee employee);
+	void DeleteEmployee(Employee employee);
 }
