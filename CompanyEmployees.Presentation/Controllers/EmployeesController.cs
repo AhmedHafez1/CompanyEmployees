@@ -35,7 +35,7 @@ public class EmployeesController : ControllerBase
         if (employee is null)
             return BadRequest("EmployeeForCreationDto object is null");
 
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
         var employeeToReturn = _service.EmployeeService.CreateEmployee(companyId, employee, trackChanges: false);
@@ -59,6 +59,9 @@ public class EmployeesController : ControllerBase
         if (employee is null)
             return BadRequest("EmployeeForUpdateDto object is null");
 
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
         _service.EmployeeService.UpdateEmployee(companyId, id, employee,
             companyTrackChanges: false, employeeTrackChanges: true);
 
@@ -75,7 +78,11 @@ public class EmployeesController : ControllerBase
         (Employee employeeEntity, EmployeeForUpdateDto employeeToPatch) =
             _service.EmployeeService.GetEmplyeeFroPatchUpdate(companyId, id, companyTrackChanges: false, employeeTrackChanges: true);
 
-        patchDoc.ApplyTo(employeeToPatch);
+        patchDoc.ApplyTo(employeeToPatch, ModelState);
+        TryValidateModel(employeeToPatch);
+
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
 
         _service.EmployeeService.SaveChangesForPatch(employeeToPatch, employeeEntity);
 
