@@ -22,7 +22,7 @@ internal sealed class EmployeeService : IEmployeeService
 
 	public IEnumerable<EmployeeDto> GetEmployees(Guid companyId, bool trackChanges)
 	{
-		var company = _repository.Company.GetCompany(companyId, trackChanges);
+		var company = _repository.Company.GetCompanyAsync(companyId, trackChanges);
 		if (company is null)
 			throw new CompanyNotFoundException(companyId);
 
@@ -34,7 +34,7 @@ internal sealed class EmployeeService : IEmployeeService
 
 	public EmployeeDto GetEmployee(Guid companyId, Guid id, bool trackChanges)
 	{
-		var company = _repository.Company.GetCompany(companyId, trackChanges);
+		var company = _repository.Company.GetCompanyAsync(companyId, trackChanges);
 		if (company is null)
 			throw new CompanyNotFoundException(companyId);
 
@@ -48,7 +48,7 @@ internal sealed class EmployeeService : IEmployeeService
 
     public EmployeeDto CreateEmployee(Guid companyId, EmployeeForCreationDto employeeForCreation, bool trackChanges)
     {
-        var company = _repository.Company.GetCompany(companyId, trackChanges);
+        var company = _repository.Company.GetCompanyAsync(companyId, trackChanges);
 
 		if (company is null) throw new CompanyNotFoundException(companyId);
 
@@ -65,7 +65,7 @@ internal sealed class EmployeeService : IEmployeeService
 
     public void DeleteEmployee(Guid companyId, Guid employeeId, bool trackChanges)
     {
-		var company = _repository.Company.GetCompany(companyId, trackChanges);
+		var company = _repository.Company.GetCompanyAsync(companyId, trackChanges);
 
 		if (company is null)
 			throw new CompanyNotFoundException(companyId);
@@ -80,7 +80,7 @@ internal sealed class EmployeeService : IEmployeeService
 
     public void UpdateEmployee(Guid companyId, Guid employeeId, EmployeeForUpdateDto employeeForUpdate, bool companyTrackChanges, bool employeeTrackChanges)
     {
-        var company = _repository.Company.GetCompany(companyId, companyTrackChanges);
+        var company = _repository.Company.GetCompanyAsync(companyId, companyTrackChanges);
 		if(company is null) throw new CompanyNotFoundException(companyId);
 
 		var employee = _repository.Employee.GetEmployee(companyId, employeeId, employeeTrackChanges);
@@ -92,7 +92,7 @@ internal sealed class EmployeeService : IEmployeeService
 
     public (Employee employeeEntity, EmployeeForUpdateDto employeeToPatch) GetEmplyeeFroPatchUpdate(Guid companyId, Guid employeeId, bool companyTrackChanges, bool employeeTrackChanges)
     {
-		var company = _repository.Company.GetCompany(companyId, companyTrackChanges);
+		var company = _repository.Company.GetCompanyAsync(companyId, companyTrackChanges);
 		if (company is null) throw new CompanyNotFoundException(companyId);
 
 		var employeeEntity = _repository.Employee.GetEmployee(companyId, employeeId, employeeTrackChanges);
