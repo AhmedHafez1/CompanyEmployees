@@ -20,7 +20,7 @@ internal sealed class CompanyService : ICompanyService
         _mapper = mapper;
     }
 
-    public async  Task<CompanyDto> CreateCompany(CompanyForCreationDto company)
+    public async Task<CompanyDto> CreateCompanyAsync(CompanyForCreationDto company)
     {
         var companyEntity = _mapper.Map<Company>(company);
 
@@ -30,11 +30,6 @@ internal sealed class CompanyService : ICompanyService
         var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
 
         return companyToReturn;
-    }
-
-    public Task<CompanyDto> CreateCompanyAsync(CompanyForCreationDto company)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<(IEnumerable<CompanyDto> companies, string ids)> CreateCompanyCollectionAsync(IEnumerable<CompanyForCreationDto> companyCollection)
@@ -59,16 +54,13 @@ internal sealed class CompanyService : ICompanyService
 
     public async Task DeleteCompanyAsync(Guid companyId, bool trackChanges)
     {
-        var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges);
-
-        if (company is null)
-            throw new CompanyNotFoundException(companyId);
+        var company = await GetCompanyAndCheckIfItExists(companyId, trackChanges);
 
         _repository.Company.DeleteCompany(company);
         await _repository.SaveAsync();
     }
 
-    public async Task<IEnumerable<CompanyDto>> GetAllCompanies(bool trackChanges)
+    public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges)
     {
         var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges);
 
@@ -77,12 +69,7 @@ internal sealed class CompanyService : ICompanyService
         return companiesDto;
     }
 
-    public Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool trackChanges)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<IEnumerable<CompanyDto>> GetCompaniesByIds(IEnumerable<Guid> ids, bool trackChanges)
+    public async Task<IEnumerable<CompanyDto>> GetCompaniesByIdsAsync(IEnumerable<Guid> ids, bool trackChanges)
     {
         if (ids is null)
             throw new IdParametersBadRequestException();
@@ -96,27 +83,29 @@ internal sealed class CompanyService : ICompanyService
         return companiesToReturn;
     }
 
-    public Task<IEnumerable<CompanyDto>> GetCompaniesByIdsAsync(IEnumerable<Guid> ids, bool trackChanges)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<CompanyDto> GetCompanyAsync(Guid id, bool trackChanges)
     {
-        var company = await _repository.Company.GetCompanyAsync(id, trackChanges);
-        if (company is null)
-            throw new CompanyNotFoundException(id);
+        Company? company = await GetCompanyAndCheckIfItExists(id, trackChanges);
 
         var companyDto = _mapper.Map<CompanyDto>(company);
         return companyDto;
     }
 
+
+
     public async Task UpdateCompanyAsync(Guid companyId, CompanyForUpdateDto companyForUpdate, bool trackChanges)
     {
-        var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges);
-        if (company is null) throw new CompanyNotFoundException(companyId);
+        var company = await GetCompanyAndCheckIfItExists(companyId, trackChanges);
 
         _mapper.Map(companyForUpdate, company);
         await _repository.SaveAsync();
+    }
+
+    private async Task<Company> GetCompanyAndCheckIfItExists(Guid id, bool trackChanges)
+    {
+        var company = await _repository.Company.GetCompanyAsync(id, trackChanges);
+        if (company is null)
+            throw new CompanyNotFoundException(id);
+        return company;
     }
 }

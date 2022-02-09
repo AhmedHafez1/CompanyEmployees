@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace CompanyEmployees.Presentation.Controllers;
 
@@ -17,9 +18,9 @@ public class EmployeesController : ControllerBase
     public EmployeesController(IServiceManager service) => _service = service;
 
     [HttpGet]
-    public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
+    public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters parameters)
     {
-        var employees = await _service.EmployeeService.GetEmployeesAsync(companyId, trackChanges: false);
+        var employees = await _service.EmployeeService.GetEmployeesAsync(companyId, parameters, trackChanges: false);
         return Ok(employees);
     }
 
@@ -49,7 +50,7 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [ServiceFilter(typeof (ValidationFilterAttribute))]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id,
         [FromBody] EmployeeForUpdateDto employee)
     {

@@ -7,7 +7,7 @@ namespace CompanyEmployees.ActionFilters
     {
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -19,7 +19,7 @@ namespace CompanyEmployees.ActionFilters
                 .SingleOrDefault(x => x.Value.ToString().Contains("Dto"))
                 .Value;
 
-            if (param != null)
+            if (param == null)
             {
                 context.Result = new BadRequestObjectResult($"Object is null. Controller: {controller}, action: {action}");
                 return;
