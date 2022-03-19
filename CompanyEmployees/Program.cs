@@ -26,12 +26,18 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 builder.Services.AddScoped<ValidationFilterAttribute>();
+builder.Services.ConfigureResponseCashing();
+builder.Services.ConfigureHttpCacheHeaders();
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentity();
+builder.Services.ConfigureJWT(builder.Configuration);
 
 builder.Services.AddControllers(config =>
 {
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
     config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+    config.CacheProfiles.Add("60SecDuration", new CacheProfile() { Duration = 60 });
 })
   //.AddXmlDataContractSerializerFormatters()
   .AddCustomCSVFormatter()
@@ -54,6 +60,10 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 app.UseCors("CorsPolicy");
 
+app.UseResponseCaching();
+app.UseHttpCacheHeaders();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
