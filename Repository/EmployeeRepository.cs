@@ -18,6 +18,7 @@ internal sealed class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRe
         .FilterEmployees(parameters.MinAge, parameters.MaxAge)
         .Search(parameters.SearchTerm)
         .OrderBy(e => e.Name)
+        .Sort(parameters.OrderBy)
         .Skip((parameters.PageNumber - 1) * parameters.PageSize)
         .Take(parameters.PageSize)
         .ToListAsync();

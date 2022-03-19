@@ -1,9 +1,8 @@
 ﻿using Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Repository.Extensions.Utility;
+using System.Linq.Dynamic.Core;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository.Extensions
 {
@@ -14,12 +13,25 @@ namespace Repository.Extensions
 
         public static IQueryable<Employee> Search(this IQueryable<Employee> employees, string searchTerm)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm)) 
+            if (string.IsNullOrWhiteSpace(searchTerm))
                 return employees;
 
             string searchTermToLower = searchTerm.ToLower();
-            
+
             return employees.Where(e => e.Name.ToLower().Contains(searchTermToLower));
+        }
+
+        public static IQueryable<Employee> Sort(this IQueryable<Employee> employees, string orderByQueryString)
+        {
+            if (string.IsNullOrWhiteSpace(orderByQueryString))
+                return employees.OrderBy(e => e.Name);
+
+            var orderQuery = OrderQueryBuilder.CreateOrderQuery<Employee>(orderByQueryString);
+
+            if (string.IsNullOrWhiteSpace(orderQuery))
+                return employees.OrderBy(e => e.Name);
+
+            return employees.OrderBy(orderQuery);
         }
     }
 }
